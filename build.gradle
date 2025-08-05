@@ -488,6 +488,7 @@ task unit_tests(type: Copy) {
 test.dependsOn unit_tests
 
 task singleTest(type: Exec) {
+
     group = 'Verification'
     description = 'Pass in the test class using -DSINGLE_TEST=${fully_qualified_test_class}'
     dependsOn executeCmake
@@ -496,6 +497,15 @@ task singleTest(type: Exec) {
     doFirst {
         delete fileTree("${buildDir}/cmake").matching {
             include '*.jar'
+        }
+
+        if (project.hasProperty("jprofiler")) {
+            def jprofilerAgent = "-agentpath:/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib=port=8849"
+            if (System.properties['TEST_JAVA_ARGS'] != null) {
+                System.properties['TEST_JAVA_ARGS'] = System.properties['TEST_JAVA_ARGS'] + " " + jprofilerAgent
+            } else {
+                System.properties['TEST_JAVA_ARGS'] = jprofilerAgent
+            }
         }
     }
     commandLine 'make', 'check-junit-single'

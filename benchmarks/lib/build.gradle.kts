@@ -1,5 +1,6 @@
 val accpVersion: String? by project
 val accpLocalJar: String by project
+val accpPanama: String by project
 val fips: Boolean by project
 val includeBenchmark: String by project
 val nativeContextReleaseStrategy: String by project
@@ -39,6 +40,10 @@ dependencies {
             jmh("software.amazon.cryptools:${accpArtifactId}:$publishedAccpVersion:${osdetector.classifier}")
         }
     }
+    
+    if (project.hasProperty("accpPanama")){
+        jmh(files(accpPanama))
+    }
 
 }
 
@@ -59,6 +64,13 @@ jmh {
     jvmArgs.add("-DversionStr=${accpVersion}")
     if (project.hasProperty("nativeContextReleaseStrategy")) {
         jvmArgs.add("-Dcom.amazon.corretto.crypto.provider.nativeContextReleaseStrategy=${nativeContextReleaseStrategy}")
+    }
+    jvmArgs.add("--enable-preview")
+    jvmArgs.add("-XX:StartFlightRecording=dumponexit=true,filename=recording.jfr")
+
+        // Add JProfiler agent (adjust the path to match your JProfiler installation)
+    if (project.hasProperty("jprofiler")) {
+        jvmArgs.add("-agentpath:/Applications/JProfiler.app/Contents/Resources/app/bin/macos/libjprofilerti.jnilib=port=8849")
     }
 }
 
