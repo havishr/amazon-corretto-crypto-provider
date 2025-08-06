@@ -169,3 +169,6 @@ JNIEXPORT void JNICALL JNI_NAME(fastDigest)(
         ex.throw_to_java(pEnv);
     }
 }
+
+
+
